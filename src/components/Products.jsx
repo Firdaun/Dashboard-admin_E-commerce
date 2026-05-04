@@ -11,6 +11,34 @@ export default function Products() {
         gcTime: 1000 * 60 * 30
     })
 
+    const formatDate = (dateString) => {
+        const now = new Date()
+        const date = new Date(dateString)
+        const diffInSeconds = Math.floor((now - date) / 1000)
+
+        const minute = 60
+        const hour = 60 * minute
+        const day = 24 * hour
+        const month = 30 * day
+
+        switch (true) {
+            case diffInSeconds < minute:
+                return 'Baru saja'
+            case diffInSeconds < hour:
+                return `${Math.floor(diffInSeconds / minute)} menit yang lalu`
+            case diffInSeconds < day:
+                return `${Math.floor(diffInSeconds / hour)} jam yang lalu`
+            case diffInSeconds < month:
+                return `${Math.floor(diffInSeconds / day)} hari yang lalu`
+            default:
+                return new Date(dateString).toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                })
+        }
+    }
+
     return (
         <div className="h-full flex flex-col p-8 w-full bg-gray-950 text-white overflow-hidden">
             {/* Header Section */}
@@ -41,16 +69,16 @@ export default function Products() {
             </div>
 
             <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden flex-1 flex flex-col shadow-xl">
-                <div className="overflow-x-auto flex-1">
-                    <table className="w-full text-left border-collapse min-w-[900px]">
-                        <thead>
-                            <tr className="border-b border-gray-800 bg-gray-900/50">
+                <div className="overflow-auto flex-1">
+                    <table className="w-full text-left border-collapse min-w-max">
+                        <thead className="sticky top-0 z-10">
+                            <tr className="border-b border-gray-800 bg-gray-900 shadow-sm">
                                 <th className="py-4 px-6 font-medium text-gray-400 text-sm uppercase tracking-wider">Produk</th>
                                 <th className="py-4 px-6 font-medium text-gray-400 text-sm uppercase tracking-wider w-1/3">Deskripsi</th>
                                 <th className="py-4 px-6 font-medium text-gray-400 text-sm uppercase tracking-wider">Level Pedas</th>
                                 <th className="py-4 px-6 font-medium text-gray-400 text-sm uppercase tracking-wider">Harga</th>
                                 <th className="py-4 px-6 font-medium text-gray-400 text-sm uppercase tracking-wider">Status</th>
-                                <th className="py-4 px-6 font-medium text-gray-400 text-sm uppercase tracking-wider text-right">Aksi</th>
+                                <th className="py-4 px-6 font-medium text-gray-400 text-sm uppercase tracking-wider text-right">Waktu dibuat</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-800">
@@ -125,12 +153,7 @@ export default function Products() {
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center justify-end gap-2">
-                                                <button className="p-2 bg-gray-800 hover:bg-indigo-600 text-gray-400 hover:text-white rounded-lg transition-colors cursor-pointer" title="Edit Product">
-                                                    <Edit className="w-4 h-4" />
-                                                </button>
-                                                <button className="p-2 bg-gray-800 hover:bg-red-600 text-gray-400 hover:text-white rounded-lg transition-colors cursor-pointer" title="Delete Product">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
+                                                {formatDate(product.createdAt)}
                                             </div>
                                         </td>
                                     </tr>

@@ -112,10 +112,10 @@ export default function Orders() {
 
             {/* Table Container */}
             <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden flex-1 flex flex-col shadow-xl">
-                <div className="overflow-x-auto flex-1">
-                    <table className="w-full text-left border-collapse min-w-[900px]">
-                        <thead>
-                            <tr className="border-b border-gray-800 bg-gray-900/50">
+                <div className="overflow-auto flex-1">
+                    <table className="w-full text-left border-collapse min-w-max">
+                        <thead className="sticky top-0 z-10">
+                            <tr className="border-b border-gray-800 bg-gray-900 shadow-sm">
                                 <th className="py-4 px-6 font-medium text-gray-400 text-sm uppercase tracking-wider">Order ID</th>
                                 <th className="py-4 px-6 font-medium text-gray-400 text-sm uppercase tracking-wider">Tanggal</th>
                                 <th className="py-4 px-6 font-medium text-gray-400 text-sm uppercase tracking-wider">Pelanggan</th>

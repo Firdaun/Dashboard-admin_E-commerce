@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+/* Custom Scrollbar Design */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px; /* Untuk scroll horizontal di tabel */
+}
+
+::-webkit-scrollbar-track {
+  background: #111827; /* Tailwind gray-900 */
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151; /* Tailwind gray-700 */
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4f46e5; /* Tailwind indigo-600 */
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent; /* Menghilangkan kotak putih di pojok pertemuan scroll */
+}
