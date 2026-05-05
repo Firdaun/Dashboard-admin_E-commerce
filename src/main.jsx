@@ -4,7 +4,6 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter, Routes, Route } from 'react-router'
 import MainAuth from './auth/MainAuth.jsx'
-import Products from './components/Products.jsx'
 import { Toaster } from 'sonner'
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
@@ -32,7 +31,6 @@ createRoot(document.getElementById('root')).render(
           <Route path='/login' element={<MainAuth />} />
         </Routes>
       </BrowserRouter>
-
     </QueryClientProvider>
   </StrictMode>,
 )

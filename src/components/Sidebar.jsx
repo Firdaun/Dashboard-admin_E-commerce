@@ -1,5 +1,5 @@
 import { Link } from "react-router"
-import { Package, ShoppingCart, MoreHorizontal } from "lucide-react"
+import { Package, ShoppingCart, MoreHorizontal, LogIn } from "lucide-react"
 import { getCurrentUser } from "../utils/user"
 import { useQuery } from "@tanstack/react-query"
 
@@ -73,10 +73,11 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                             </div>
                         </div>
                     </div>
-                ) : isError ? (
-                    <div className="p-2 text-sm text-red-400 text-center font-medium bg-red-950/30 rounded-lg border border-red-900/50">
-                        Gagal memuat profil
-                    </div>
+                ) : isError || !user ? (
+                    <Link to="/login" className="flex items-center justify-center gap-2 p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors w-full font-medium shadow-sm">
+                        <LogIn className="w-4 h-4" />
+                        <span>Login</span>
+                    </Link>
                 ) : (
                     <div className="flex items-center justify-between p-2 hover:bg-gray-900 rounded-xl transition-colors cursor-pointer">
                         <div className="flex items-center gap-3">
