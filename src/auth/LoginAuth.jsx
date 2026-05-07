@@ -106,5 +106,5 @@ export default function LoginAuth() {
             </div>
 
         </div>
-    );
+    )
 }

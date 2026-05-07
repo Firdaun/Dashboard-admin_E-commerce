@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { Plus, Search, Filter, Edit, Trash2, Flame } from 'lucide-react';
-import { getProducts } from '../utils/product';
+import { useQuery } from '@tanstack/react-query'
+import { Plus, Search, Filter, Edit, Trash2, Flame } from 'lucide-react'
+import { getProducts } from '../utils/product'
 
 export default function Products() {
     
@@ -173,5 +173,5 @@ export default function Products() {
                 </div>
             </div>
         </div>
-    );
+    )
 }

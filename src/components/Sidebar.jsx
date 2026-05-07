@@ -41,7 +41,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
 
                 <div className="flex flex-col space-y-2">
                     {listMenu.map((menu) => {
-                        const isActive = activeTab === menu.active;
+                        const isActive = activeTab === menu.active
                         return (
                             <div 
                                 key={menu.id}
@@ -57,7 +57,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                                 </span>
                                 <span className={`font-medium ${isActive ? 'text-white' : ''}`}>{menu.name}</span>
                             </div>
-                        );
+                        )
                     })}
                 </div>
             </div>

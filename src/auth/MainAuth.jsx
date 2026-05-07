@@ -1,4 +1,4 @@
-import LoginAuth from "./LoginAuth";
+import LoginAuth from "./LoginAuth"
 
 export default function MainAuth() {
     return (

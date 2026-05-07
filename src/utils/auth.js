@@ -1,36 +1,41 @@
 import { fetcher } from "./fetcher"
 
 export const registerUser = async (data) => {
-    return await fetcher('/users/register', {
+    const result = await fetcher('/users/register', {
         method: 'POST',
         body: JSON.stringify(data)
     })
+    return result
 }
 
 export const verifyEmail = async (data) => {
-    return await fetcher('/users/verify-email', {
+    const result = await fetcher('/users/verify-email', {
         method: 'POST',
         body: JSON.stringify(data)
     })
+    return result
 }
 
 export const login = async (data) => {
-    return await fetcher('/users/login', {
+    const result = await fetcher('/users/login', {
         method: 'POST',
         body: JSON.stringify(data)
     })
+    return result
 }
 
 export const resetPasswordRequest = async (data) => {
-    return await fetcher('/users/reset-password/request', {
+    const result = await fetcher('/users/reset-password/request', {
         method: 'POST',
         body: JSON.stringify(data)
     })
+    return result
 }
 
 export const resetPassword = async (data) => {
-    return await fetcher('/users/reset-password', {
+    const result = await fetcher('/users/reset-password', {
         method: 'POST',
         body: JSON.stringify(data)
     })
+    return result
 }

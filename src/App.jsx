@@ -1,8 +1,8 @@
-import Sidebar from "./components/Sidebar";
-import { useState } from "react";
-import Products from "./components/Products";
-import Orders from "./components/Orders";
-import { useOrderWebSocket } from "./hooks/useOrderWebSocket";
+import Sidebar from "./components/Sidebar"
+import { useState } from "react"
+import Products from "./components/Products"
+import Orders from "./components/Orders"
+import { useOrderWebSocket } from "./hooks/useOrderWebSocket"
 
 export default function App() {
     const [activeTab, setActiveTab] = useState('products')

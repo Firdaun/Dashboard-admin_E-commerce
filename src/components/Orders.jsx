@@ -1,72 +1,83 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState, useRef, useEffect } from 'react';
-import { Search, Filter, Eye, CheckCircle2, Clock, Truck, XCircle, ChevronDown, CookingPot, Loader2 } from 'lucide-react';
-import { getOrders, updateOrders } from '../utils/orders';
-import { toast } from 'sonner';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState, useRef, useEffect } from 'react'
+import { Search, Filter, Eye, CheckCircle2, Clock, Truck, XCircle, ChevronDown, CookingPot, Loader2 } from 'lucide-react'
+import { getOrders, updateOrders } from '../utils/orders'
+import { toast } from 'sonner'
 
-const STATUS_LIST = ['Menunggu', 'Sedang Dimasak', 'Dikirim', 'Selesai', 'Dibatalkan'];
+const STATUS_LIST = ['Menunggu', 'Sedang Dimasak', 'Dikirim', 'Selesai', 'Dibatalkan']
 
 function StatusDropdown({ currentStatus, orderId }) {
-    const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef(null);
-    const queryClient = useQueryClient();
+    const [isOpen, setIsOpen] = useState(false)
+    const dropdownRef = useRef(null)
+    const queryClient = useQueryClient()
 
     const mutation = useMutation({
         mutationFn: ({ id, status }) => updateOrders(id, status),
-        onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ['orders'] });
-            toast.success(`Status pesanan #${orderId} berhasil diubah`);
-        },
-        onError: (error) => {
-            toast.error(`Gagal mengubah status: ${error.message}`);
-        }
-    });
+    })
 
     // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-                setIsOpen(false);
+                setIsOpen(false)
             }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
 
     const handleStatusChange = (newStatus) => {
         if (newStatus === currentStatus) {
-            setIsOpen(false);
-            return;
+            setIsOpen(false)
+            return
         }
-        mutation.mutate({ id: orderId, status: newStatus });
-        setIsOpen(false);
-    };
+        toast.promise(
+            new Promise((resolve, reject) => {
+                mutation.mutate({
+                    id: orderId,
+                    status: newStatus
+                }, {
+                    onSuccess: (data) => {
+                        queryClient.invalidateQueries({ queryKey: ['orders'] })
+                        setIsOpen(false)
+                        resolve(data)
+                    },
+                    onError: (error) => reject(error)
+                })
+            }),
+            {
+                loading: 'Memperbarui status...',
+                success: (data) => data.message,
+                error: (error) => error.message
+            }
+        )
+    }
 
     const getStatusStyle = (status) => {
-        switch(status) {
-            case 'Selesai': 
-                return { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', icon: <CheckCircle2 className="w-4 h-4" /> };
-            case 'Sedang Dimasak': 
-                return { color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20', icon: <CookingPot className="w-4 h-4" /> };
-            case 'Dikirim': 
-                return { color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20', icon: <Truck className="w-4 h-4" /> };
-            case 'Menunggu': 
-                return { color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20', icon: <Clock className="w-4 h-4" /> };
-            case 'Dibatalkan': 
-                return { color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20', icon: <XCircle className="w-4 h-4" /> };
-            default: 
-                return { color: 'text-gray-400', bg: 'bg-gray-500/10', border: 'border-gray-500/20', icon: <Clock className="w-4 h-4" /> };
+        switch (status) {
+            case 'Selesai':
+                return { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', icon: <CheckCircle2 className="w-4 h-4" /> }
+            case 'Sedang Dimasak':
+                return { color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20', icon: <CookingPot className="w-4 h-4" /> }
+            case 'Dikirim':
+                return { color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20', icon: <Truck className="w-4 h-4" /> }
+            case 'Menunggu':
+                return { color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20', icon: <Clock className="w-4 h-4" /> }
+            case 'Dibatalkan':
+                return { color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20', icon: <XCircle className="w-4 h-4" /> }
+            default:
+                return { color: 'text-gray-400', bg: 'bg-gray-500/10', border: 'border-gray-500/20', icon: <Clock className="w-4 h-4" /> }
         }
-    };
+    }
 
-    const currentStyle = getStatusStyle(currentStatus);
+    const currentStyle = getStatusStyle(currentStatus)
 
     return (
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={(e) => {
-                    e.stopPropagation();
-                    setIsOpen(!isOpen);
+                    e.stopPropagation()
+                    setIsOpen(!isOpen)
                 }}
                 disabled={mutation.isPending}
                 className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full border cursor-pointer transition-all hover:brightness-125 ${currentStyle.bg} ${currentStyle.color} ${currentStyle.border} ${mutation.isPending ? 'opacity-60' : ''}`}
@@ -83,20 +94,18 @@ function StatusDropdown({ currentStatus, orderId }) {
             {isOpen && (
                 <div className="absolute top-full left-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl shadow-black/50 z-50 py-1.5 animate-in fade-in slide-in-from-top-2 duration-150">
                     {STATUS_LIST.map((status) => {
-                        const style = getStatusStyle(status);
-                        const isActive = status === currentStatus;
+                        const style = getStatusStyle(status)
+                        const isActive = status === currentStatus
                         return (
                             <button
                                 key={status}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleStatusChange(status);
+                                onClick={() => {
+                                    handleStatusChange(status)
                                 }}
-                                className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-sm transition-colors cursor-pointer ${
-                                    isActive
+                                className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-sm transition-colors cursor-pointer ${isActive
                                         ? 'bg-gray-700/50 font-medium'
                                         : 'hover:bg-gray-700/40'
-                                } ${style.color}`}
+                                    } ${style.color}`}
                             >
                                 {style.icon}
                                 <span>{status}</span>
@@ -104,12 +113,12 @@ function StatusDropdown({ currentStatus, orderId }) {
                                     <CheckCircle2 className="w-3.5 h-3.5 ml-auto text-indigo-400" />
                                 )}
                             </button>
-                        );
+                        )
                     })}
                 </div>
             )}
         </div>
-    );
+    )
 }
 
 export default function Orders() {
@@ -118,16 +127,16 @@ export default function Orders() {
         queryFn: getOrders,
         staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 15
-    });
+    })
 
     const formatRupiah = (number) => {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
-    };
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number)
+    }
 
     const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'short', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('id-ID', options);
-    };
+        const options = { year: 'numeric', month: 'short', day: 'numeric' }
+        return new Date(dateString).toLocaleDateString('id-ID', options)
+    }
 
     return (
         <div className="h-full flex flex-col p-8 w-full bg-gray-950 text-white overflow-hidden">
@@ -147,9 +156,9 @@ export default function Orders() {
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
-                    <input 
-                        type="text" 
-                        placeholder="Cari ID Pesanan atau Nama Pelanggan..." 
+                    <input
+                        type="text"
+                        placeholder="Cari ID Pesanan atau Nama Pelanggan..."
                         className="w-full bg-gray-900 border border-gray-800 rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-colors placeholder-gray-500 text-white"
                     />
                 </div>
@@ -249,13 +258,13 @@ export default function Orders() {
                                                 </div>
                                             </td>
                                         </tr>
-                                    );
+                                    )
                                 })
                             )}
                         </tbody>
                     </table>
                 </div>
-                
+
                 {/* Pagination */}
                 <div className="border-t border-gray-800 p-4 flex items-center justify-between text-sm text-gray-400 bg-gray-900/80">
                     <span>Menampilkan {orders?.length || 0} pesanan</span>
@@ -267,5 +276,5 @@ export default function Orders() {
                 </div>
             </div>
         </div>
-    );
+    )
 }

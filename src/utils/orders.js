@@ -14,5 +14,5 @@ export const updateOrders = async (id, status) => {
         requireAuth: true,
         body: JSON.stringify({ status })
     })
-    return result.data
+    return result
 }
