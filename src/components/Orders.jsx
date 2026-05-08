@@ -80,7 +80,7 @@ function StatusDropdown({ currentStatus, orderId }) {
                     setIsOpen(!isOpen)
                 }}
                 disabled={mutation.isPending}
-                className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full border cursor-pointer transition-all hover:brightness-125 ${currentStyle.bg} ${currentStyle.color} ${currentStyle.border} ${mutation.isPending ? 'opacity-60' : ''}`}
+                className={`inline-flex items-center justify-center gap-1.5 px-3 py-1 min-w-[180px] text-xs font-medium rounded-full border cursor-pointer transition-all hover:brightness-125 ${currentStyle.bg} ${currentStyle.color} ${currentStyle.border} ${mutation.isPending ? 'opacity-60' : ''}`}
             >
                 {mutation.isPending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -102,16 +102,14 @@ function StatusDropdown({ currentStatus, orderId }) {
                                 onClick={() => {
                                     handleStatusChange(status)
                                 }}
-                                className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-sm transition-colors cursor-pointer ${isActive
+                                className={` w-full whitespace-nowrap flex items-center gap-2.5 px-3.5 py-2 text-sm transition-colors cursor-pointer ${isActive
                                         ? 'bg-gray-700/50 font-medium'
                                         : 'hover:bg-gray-700/40'
                                     } ${style.color}`}
                             >
                                 {style.icon}
-                                <span>{status}</span>
-                                {isActive && (
-                                    <CheckCircle2 className="w-3.5 h-3.5 ml-auto text-indigo-400" />
-                                )}
+                                {status}
+                                {isActive && <CheckCircle2 className="w-3.5 h-3.5 ml-auto text-indigo-400" />}
                             </button>
                         )
                     })}
