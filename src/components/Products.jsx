@@ -1,9 +1,39 @@
+import { useState, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Plus, Search, Filter, Edit, Trash2, Flame } from 'lucide-react'
+import { Plus, Search, Filter, Edit, Trash2, Flame, CheckCircle, XCircle } from 'lucide-react'
 import { getProducts } from '../utils/product'
 
 export default function Products() {
     
+    const [contextMenu, setContextMenu] = useState({
+        visible: false,
+        x: 0,
+        y: 0,
+        product: null
+    });
+    const contextMenuRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (contextMenuRef.current && !contextMenuRef.current.contains(event.target)) {
+                setContextMenu(prev => ({ ...prev, visible: false }));
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
+
+    const handleContextMenu = (e, product) => {
+        e.preventDefault();
+        setContextMenu({
+            visible: true,
+            x: e.clientX,
+            y: e.clientY,
+            product
+        });
+    };
+
     const { data: products, isLoading, isError } = useQuery({
         queryKey: ['products'],
         queryFn: getProducts,
@@ -120,7 +150,11 @@ export default function Products() {
                                 </tr>
                             ) : (
                                 products?.map((product) => (
-                                    <tr key={product.id} className="hover:bg-gray-800/50 transition-colors group">
+                                    <tr 
+                                        key={product.id} 
+                                        className="hover:bg-gray-800/50 transition-colors group cursor-context-menu"
+                                        onContextMenu={(e) => handleContextMenu(e, product)}
+                                    >
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 rounded-lg bg-gray-800 overflow-hidden border border-gray-700 shrink-0">
@@ -172,6 +206,54 @@ export default function Products() {
                     </div>
                 </div>
             </div>
+
+            {/* Context Menu */}
+            {contextMenu.visible && (
+                <div 
+                    ref={contextMenuRef}
+                    className="fixed z-50 bg-gray-900 border border-gray-700 rounded-lg shadow-2xl py-2 min-w-[220px]"
+                    style={{ top: contextMenu.y, left: contextMenu.x }}
+                >
+                    <div className="px-4 py-2 border-b border-gray-800 mb-1">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi Produk</p>
+                        <p className="text-sm font-medium text-gray-300 truncate mt-1">{contextMenu.product?.variant}</p>
+                    </div>
+                    <button 
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white flex items-center gap-3 transition-colors cursor-pointer"
+                        onClick={() => {
+                            console.log('Update', contextMenu.product);
+                            setContextMenu(prev => ({ ...prev, visible: false }));
+                        }}
+                    >
+                        <Edit className="w-4 h-4 text-indigo-400" />
+                        Update Product
+                    </button>
+                    <button 
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white flex items-center gap-3 transition-colors cursor-pointer"
+                        onClick={() => {
+                            console.log('Set Availability', contextMenu.product);
+                            setContextMenu(prev => ({ ...prev, visible: false }));
+                        }}
+                    >
+                        {contextMenu.product?.is_available ? (
+                            <><XCircle className="w-4 h-4 text-orange-400" /> Set Tidak Tersedia</>
+                        ) : (
+                            <><CheckCircle className="w-4 h-4 text-emerald-400" /> Set Tersedia</>
+                        )}
+                    </button>
+                    <div className="h-px bg-gray-800 my-1"></div>
+                    <button 
+                        className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center gap-3 transition-colors cursor-pointer"
+                        onClick={() => {
+                            console.log('Delete', contextMenu.product);
+                            setContextMenu(prev => ({ ...prev, visible: false }));
+                        }}
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        Hapus Product
+                    </button>
+                </div>
+            )}
         </div>
     )
 }
