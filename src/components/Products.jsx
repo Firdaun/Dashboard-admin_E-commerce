@@ -6,7 +6,7 @@ import UpdateProductPopup from './UpdateProductPopup'
 
 export default function Products() {
     const queryClient = useQueryClient();
-    
+
     const [contextMenu, setContextMenu] = useState({
         visible: false,
         x: 0,
@@ -56,31 +56,37 @@ export default function Products() {
         gcTime: 1000 * 60 * 30
     })
 
-    const formatDate = (dateString) => {
-        const now = new Date()
-        const date = new Date(dateString)
-        const diffInSeconds = Math.floor((now - date) / 1000)
-
-        const minute = 60
-        const hour = 60 * minute
-        const day = 24 * hour
-        const month = 30 * day
-
+    const formatDate = (d) => {
+        let now = new Date()
+        let date = new Date(d)
+        let secs = Math.floor((now - date) / 1000)
+        let minute = 60
+        let hour = 60 * minute
+        let day = 24 * hour
+        let month = 30 * day
+        let minutes = Math.floor(secs / minute)
+        let hours = Math.floor(secs / hour)
+        let days = Math.floor(secs / day)
         switch (true) {
-            case diffInSeconds < minute:
+            case secs < minute:
                 return 'Baru saja'
-            case diffInSeconds < hour:
-                return `${Math.floor(diffInSeconds / minute)} menit yang lalu`
-            case diffInSeconds < day:
-                return `${Math.floor(diffInSeconds / hour)} jam yang lalu`
-            case diffInSeconds < month:
-                return `${Math.floor(diffInSeconds / day)} hari yang lalu`
+            case secs < hour:
+                return `${minutes} menit yang lalu`
+            case secs < day:
+                return `${hours} jam yang lalu`
+            case secs < month:
+                return `${days} hari yang lalu`
             default:
-                return new Date(dateString).toLocaleDateString('id-ID', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                })
+                let res = new Date(d)
+                    .toLocaleDateString(
+                        'id-ID',
+                        {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                        }
+                    )
+                return res
         }
     }
 
@@ -101,9 +107,9 @@ export default function Products() {
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
-                    <input 
-                        type="text" 
-                        placeholder="Cari varian produk..." 
+                    <input
+                        type="text"
+                        placeholder="Cari varian produk..."
                         className="w-full bg-gray-900 border border-gray-800 rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-colors placeholder-gray-500 text-white"
                     />
                 </div>
@@ -165,8 +171,8 @@ export default function Products() {
                                 </tr>
                             ) : (
                                 products?.map((product) => (
-                                    <tr 
-                                        key={product.id} 
+                                    <tr
+                                        key={product.id}
                                         className="hover:bg-gray-800/50 transition-colors group cursor-context-menu"
                                         onContextMenu={(e) => handleContextMenu(e, product)}
                                     >
@@ -211,7 +217,7 @@ export default function Products() {
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div className="border-t border-gray-800 p-4 flex items-center justify-between text-sm text-gray-400 bg-gray-900/80">
                     <span>Menampilkan {products?.length || 0} produk</span>
                     <div className="flex gap-1">
@@ -224,7 +230,7 @@ export default function Products() {
 
             {/* Context Menu */}
             {contextMenu.visible && (
-                <div 
+                <div
                     ref={contextMenuRef}
                     className="fixed z-50 bg-gray-900 border border-gray-700 rounded-lg shadow-2xl py-2 min-w-[220px]"
                     style={{ top: contextMenu.y, left: contextMenu.x }}
@@ -233,7 +239,7 @@ export default function Products() {
                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi Produk</p>
                         <p className="text-sm font-medium text-gray-300 truncate mt-1">{contextMenu.product?.variant}</p>
                     </div>
-                    <button 
+                    <button
                         className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white flex items-center gap-3 transition-colors cursor-pointer"
                         onClick={() => {
                             setSelectedProductToUpdate(contextMenu.product);
@@ -244,7 +250,7 @@ export default function Products() {
                         <Edit className="w-4 h-4 text-indigo-400" />
                         Update Product
                     </button>
-                    <button 
+                    <button
                         className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white flex items-center gap-3 transition-colors cursor-pointer disabled:opacity-50"
                         disabled={toggleAvailabilityMutation.isPending}
                         onClick={() => {
@@ -262,7 +268,7 @@ export default function Products() {
                         )}
                     </button>
                     <div className="h-px bg-gray-800 my-1"></div>
-                    <button 
+                    <button
                         className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center gap-3 transition-colors cursor-pointer"
                         onClick={() => {
                             console.log('Delete', contextMenu.product);
@@ -276,10 +282,10 @@ export default function Products() {
             )}
 
             {/* Update Product Popup */}
-            <UpdateProductPopup 
-                isOpen={isUpdatePopupOpen} 
-                onClose={() => setIsUpdatePopupOpen(false)} 
-                product={selectedProductToUpdate} 
+            <UpdateProductPopup
+                isOpen={isUpdatePopupOpen}
+                onClose={() => setIsUpdatePopupOpen(false)}
+                product={selectedProductToUpdate}
             />
         </div>
     )
