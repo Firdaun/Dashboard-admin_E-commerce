@@ -23,10 +23,10 @@ export default function UpdateProductPopup({ isOpen, onClose, product }) {
 
     if (!isOpen) return null;
 
-    const handleKirim = (data) => {
+    const handleKirim = (dataProduct) => {
         toast.promise(
             new Promise((resolve, reject) => {
-                mutation.mutate({ id: product.id, updateData: data }, {
+                mutation.mutate({ id: product.id, data: dataProduct }, {
                     onSuccess: (result) => {
                         queryClient.invalidateQueries({ queryKey: ['products'] })
                         setTimeout(() => onClose(), 500)
