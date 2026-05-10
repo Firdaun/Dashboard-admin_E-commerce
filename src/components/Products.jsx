@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Search, Filter, Edit, Trash2, Flame, CheckCircle, XCircle } from 'lucide-react'
-import { getProducts } from '../utils/product'
+import { getProducts, updateProduct } from '../utils/product'
+import UpdateProductPopup from './UpdateProductPopup'
 
 export default function Products() {
+    const queryClient = useQueryClient();
     
     const [contextMenu, setContextMenu] = useState({
         visible: false,
@@ -12,6 +14,8 @@ export default function Products() {
         product: null
     });
     const contextMenuRef = useRef(null);
+    const [isUpdatePopupOpen, setIsUpdatePopupOpen] = useState(false);
+    const [selectedProductToUpdate, setSelectedProductToUpdate] = useState(null);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -33,6 +37,17 @@ export default function Products() {
             product
         });
     };
+
+    const toggleAvailabilityMutation = useMutation({
+        mutationFn: ({ id, is_available }) => updateProduct(id, { is_available }),
+        onSuccess: () => {
+            queryClient.invalidateQueries(['products']);
+        },
+        onError: (error) => {
+            console.error('Failed to toggle availability:', error);
+            alert('Gagal mengubah ketersediaan produk.');
+        }
+    });
 
     const { data: products, isLoading, isError } = useQuery({
         queryKey: ['products'],
@@ -221,7 +236,8 @@ export default function Products() {
                     <button 
                         className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white flex items-center gap-3 transition-colors cursor-pointer"
                         onClick={() => {
-                            console.log('Update', contextMenu.product);
+                            setSelectedProductToUpdate(contextMenu.product);
+                            setIsUpdatePopupOpen(true);
                             setContextMenu(prev => ({ ...prev, visible: false }));
                         }}
                     >
@@ -229,9 +245,13 @@ export default function Products() {
                         Update Product
                     </button>
                     <button 
-                        className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white flex items-center gap-3 transition-colors cursor-pointer"
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white flex items-center gap-3 transition-colors cursor-pointer disabled:opacity-50"
+                        disabled={toggleAvailabilityMutation.isPending}
                         onClick={() => {
-                            console.log('Set Availability', contextMenu.product);
+                            toggleAvailabilityMutation.mutate({
+                                id: contextMenu.product.id,
+                                is_available: !contextMenu.product.is_available
+                            });
                             setContextMenu(prev => ({ ...prev, visible: false }));
                         }}
                     >
@@ -254,6 +274,13 @@ export default function Products() {
                     </button>
                 </div>
             )}
+
+            {/* Update Product Popup */}
+            <UpdateProductPopup 
+                isOpen={isUpdatePopupOpen} 
+                onClose={() => setIsUpdatePopupOpen(false)} 
+                product={selectedProductToUpdate} 
+            />
         </div>
     )
 }
