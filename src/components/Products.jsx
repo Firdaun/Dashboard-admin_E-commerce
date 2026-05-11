@@ -30,10 +30,28 @@ export default function Products() {
 
     const handleContextMenu = (e, product) => {
         e.preventDefault();
+        
+        // Estimasi ukuran menu berdasarkan isi kontennya
+        const menuWidth = 220; 
+        const menuHeight = 220;
+
+        let x = e.clientX;
+        let y = e.clientY;
+
+        // Jika menu keluar dari layar sisi kanan, buka ke kiri
+        if (x + menuWidth > window.innerWidth) {
+            x = x - menuWidth;
+        }
+
+        // Jika menu keluar dari layar sisi bawah, buka ke atas
+        if (y + menuHeight > window.innerHeight) {
+            y = y - menuHeight;
+        }
+
         setContextMenu({
             visible: true,
-            x: e.clientX,
-            y: e.clientY,
+            x,
+            y,
             product
         });
     };
