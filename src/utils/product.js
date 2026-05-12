@@ -15,3 +15,12 @@ export const updateProduct = async (id, data) => {
     })
     return result
 }
+
+export const createProduct = async (data) => {
+    const result = await fetcher('/products', {
+        method: 'POST',
+        requireAuth: true,
+        body: JSON.stringify(data)
+    })
+    return result
+}

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Search, Filter, Edit, Trash2, Flame, CheckCircle, XCircle } from 'lucide-react'
 import { getProducts, updateProduct } from '../utils/product'
 import UpdateProductPopup from './UpdateProductPopup'
+import CreateProductPopup from './CreateProductPopup'
 
 export default function Products() {
     const queryClient = useQueryClient();
@@ -16,6 +17,7 @@ export default function Products() {
     const contextMenuRef = useRef(null);
     const [isUpdatePopupOpen, setIsUpdatePopupOpen] = useState(false);
     const [selectedProductToUpdate, setSelectedProductToUpdate] = useState(null);
+    const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -31,19 +33,16 @@ export default function Products() {
     const handleContextMenu = (e, product) => {
         e.preventDefault();
         
-        // Estimasi ukuran menu berdasarkan isi kontennya
         const menuWidth = 220; 
         const menuHeight = 220;
 
         let x = e.clientX;
         let y = e.clientY;
 
-        // Jika menu keluar dari layar sisi kanan, buka ke kiri
         if (x + menuWidth > window.innerWidth) {
             x = x - menuWidth;
         }
 
-        // Jika menu keluar dari layar sisi bawah, buka ke atas
         if (y + menuHeight > window.innerHeight) {
             y = y - menuHeight;
         }
@@ -116,7 +115,10 @@ export default function Products() {
                     <h1 className="text-3xl font-bold tracking-tight">Products</h1>
                     <p className="text-gray-400 mt-1">Kelola katalog produk, harga, dan ketersediaan barang.</p>
                 </div>
-                <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-indigo-500/20 shrink-0 cursor-pointer">
+                <button 
+                    onClick={() => setIsCreatePopupOpen(true)}
+                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-indigo-500/20 shrink-0 cursor-pointer"
+                >
                     <Plus className="w-5 h-5" />
                     <span>Tambah Produk</span>
                 </button>
@@ -304,6 +306,12 @@ export default function Products() {
                 isOpen={isUpdatePopupOpen}
                 onClose={() => setIsUpdatePopupOpen(false)}
                 product={selectedProductToUpdate}
+            />
+
+            {/* Create Product Popup */}
+            <CreateProductPopup
+                isOpen={isCreatePopupOpen}
+                onClose={() => setIsCreatePopupOpen(false)}
             />
         </div>
     )
