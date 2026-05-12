@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Search, Filter, Edit, Trash2, Flame, CheckCircle, XCircle } from 'lucide-react'
-import { getProducts, updateProduct } from '../utils/product'
+import { getProducts, updateProduct, deleteProduct } from '../utils/product'
+import { toast } from 'sonner'
 import UpdateProductPopup from './UpdateProductPopup'
 import CreateProductPopup from './CreateProductPopup'
 
@@ -65,6 +66,40 @@ export default function Products() {
             alert('Gagal mengubah ketersediaan produk.');
         }
     });
+
+    const deleteProductMutation = useMutation({
+        mutationFn: (id) => deleteProduct(id)
+    });
+
+    const handleDeleteProduct = (product) => {
+        toast('Hapus produk "' + product.variant + '"?', {
+            description: 'Produk yang sudah dihapus tidak dapat dikembalikan.',
+            action: {
+                label: 'Hapus',
+                onClick: () => {
+                    toast.promise(
+                        new Promise((resolve, reject) => {
+                            deleteProductMutation.mutate(product.id, {
+                                onSuccess: (result) => {
+                                    queryClient.invalidateQueries({ queryKey: ['products'] })
+                                    resolve(result)
+                                },
+                                onError: (error) => reject(error)
+                            })
+                        }),
+                        {
+                            loading: 'Menghapus produk...',
+                            success: (data) => data.message || 'Produk berhasil dihapus!',
+                            error: (error) => error.message || 'Gagal menghapus produk.'
+                        }
+                    )
+                }
+            },
+            cancel: {
+                label: 'Batal'
+            }
+        })
+    };
 
     const { data: products, isLoading, isError } = useQuery({
         queryKey: ['products'],
@@ -289,9 +324,10 @@ export default function Products() {
                     </button>
                     <div className="h-px bg-gray-800 my-1"></div>
                     <button
-                        className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center gap-3 transition-colors cursor-pointer"
+                        className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center gap-3 transition-colors cursor-pointer disabled:opacity-50"
+                        disabled={deleteProductMutation.isPending}
                         onClick={() => {
-                            console.log('Delete', contextMenu.product);
+                            handleDeleteProduct(contextMenu.product);
                             setContextMenu(prev => ({ ...prev, visible: false }));
                         }}
                     >

@@ -24,3 +24,11 @@ export const createProduct = async (data) => {
     })
     return result
 }
+
+export const deleteProduct = async (id) => {
+    const result = await fetcher(`/products/${id}`, {
+        method: 'DELETE',
+        requireAuth: true
+    })
+    return result
+}
